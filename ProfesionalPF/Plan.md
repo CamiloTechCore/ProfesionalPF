@@ -72,6 +72,8 @@ F --> S4[/src/hooks]
 | `/src/pages`      | Dashboard, Perfil, Login, Registro |
 | `/src/assets`     | CSS base y recursos visuales       |
 | `/src/hooks`      | Estados y consumo de APIs          |
+| `/src/hooks`      | Estados y consumo de APIs          |
+| `/src/context`    | Estado global del usuario logueado |
 
 ---
 
