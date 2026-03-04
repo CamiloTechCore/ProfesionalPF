@@ -296,4 +296,3 @@ El proyecto **P&PF** está diseñado como una plataforma:
 * Analíticamente robusta
 * Preparada para crecimiento SaaS
 
-
