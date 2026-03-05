@@ -18,4 +18,14 @@ const calculateAge = (birthDate) => {
     return age;
 };
 
-module.exports = { calculateAge };
+/**
+ * Algoritmo de Proyección (Fase 4.4)
+ * @param {number} P - Aporte mensual (Ahorro neto)
+ * @param {number} i - Tasa mensual (Ej: 0.008 para 0.8% mensual)
+ * @param {number} months - Tiempo en meses
+ */
+const calculateFutureValue = (P, i, months) => {
+    if (i <= 0) return P * months; // Si no hay interés, es solo ahorro simple
+    return P * (Math.pow(1 + i, months) - 1) / i;
+};
+module.exports = { calculateAge, calculateFutureValue };

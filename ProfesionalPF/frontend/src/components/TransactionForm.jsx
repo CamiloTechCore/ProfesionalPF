@@ -1,38 +1,55 @@
-import React, { useState } from 'react';
-//import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion'; // Corregida la importación
 import axios from 'axios';
 
 const TransactionForm = ({ userId, onTransactionAdded }) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    USER_ID: userId,
-    AMOUNT_COP: '',
-    TRANSACTION_TYPE: 'EXPENSE',
-    CATEGORY: 'Vivienda',
-    TRANSACTION_DATE: new Date().toISOString().split('T')[0],
-    DESCRIPTION: ''
-  });
-
-  const categories = {
-    INCOME: ['Sueldo', 'Honorarios', 'Renta', 'Otros Ingresos'],
-    EXPENSE: ['Vivienda', 'Alimentación', 'Transporte', 'Salud', 'Educación', 'Ocio'],
-    SAVING: ['Fondo de Emergencia', 'Inversión E.A.', 'Ahorro Programado']
+  
+  // Categorías según el Roadmap 4.2
+  const categoriesMap = {
+    income: ['Sueldo', 'Honorarios', 'Renta', 'Otros Ingresos'],
+    expense: ['Vivienda', 'Alimentación', 'Transporte', 'Salud', 'Educación', 'Ocio'],
+    saving: ['Fondo de Emergencia', 'Inversión E.A.', 'Ahorro Programado']
   };
 
+  const [formData, setFormData] = useState({
+    user_id: userId, // Minúsculas para coincidir con DB
+    amount_cop: '',
+    transaction_type: 'expense',
+    category: 'Vivienda',
+    transaction_date: new Date().toISOString().split('T')[0],
+    description: ''
+  });
+
+  // Efecto para resetear la categoría cuando cambia el tipo de movimiento
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      category: categoriesMap[prev.transaction_type][0]
+    }));
+  }, [formData.transaction_type]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name.toLowerCase()]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.AMOUNT_COP <= 0) return alert("El monto debe ser mayor a cero");
+    if (parseFloat(formData.amount_cop) <= 0) return alert("El monto debe ser mayor a cero");
 
     setLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL;
-      await axios.post(`${API_URL}/transactions`, formData);
+      // Endpoint corregido según tu estructura de backend
+      await axios.post(`${API_URL}/transactions/add`, formData); 
+      
       alert("Transacción registrada correctamente");
-      onTransactionAdded(); // Recarga los saldos en el Dashboard
+      
+      if (onTransactionAdded) onTransactionAdded(); // Callback para refrescar el Dashboard
+      
+      // Limpiar solo los campos variables
+      setFormData(prev => ({ ...prev, amount_cop: '', description: '' }));
     } catch (error) {
       alert("Error al registrar: " + (error.response?.data?.error || "Error de red"));
     } finally {
@@ -54,14 +71,14 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
         <div className="ppf-form__group">
           <label className="ppf-label">TIPO DE MOVIMIENTO</label>
           <select 
-            name="TRANSACTION_TYPE" 
+            name="transaction_type" 
             className="ppf-input" 
             onChange={handleChange}
-            value={formData.TRANSACTION_TYPE}
+            value={formData.transaction_type}
           >
-            <option value="INCOME">Ingreso (+)</option>
-            <option value="EXPENSE">Gasto (-)</option>
-            <option value="SAVING">Ahorro (Investing)</option>
+            <option value="income">Ingreso (+)</option>
+            <option value="expense">Gasto (-)</option>
+            <option value="saving">Ahorro (Investing)</option>
           </select>
         </div>
 
@@ -69,9 +86,10 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           <label className="ppf-label">VALOR EN PESOS (COP)</label>
           <input 
             type="number" 
-            name="AMOUNT_COP" 
+            name="amount_cop" 
             className="ppf-input" 
             placeholder="0.00" 
+            value={formData.amount_cop}
             onChange={handleChange}
             required 
           />
@@ -79,20 +97,38 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
 
         <div className="ppf-form__group">
           <label className="ppf-label">CATEGORÍA</label>
-          <select name="CATEGORY" className="ppf-input" onChange={handleChange}>
-            {categories[formData.TRANSACTION_TYPE].map(cat => (
+          <select 
+            name="category" 
+            className="ppf-input" 
+            value={formData.category} 
+            onChange={handleChange}
+          >
+            {categoriesMap[formData.transaction_type].map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
 
         <div className="ppf-form__group">
+          <label className="ppf-label">DESCRIPCIÓN</label>
+          <input 
+            type="text" 
+            name="description" 
+            className="ppf-input" 
+            placeholder="Ej: Pago de internet" 
+            value={formData.description}
+            onChange={handleChange}
+            maxLength={100}
+          />
+        </div>
+
+        <div className="ppf-form__group">
           <label className="ppf-label">FECHA</label>
           <input 
             type="date" 
-            name="TRANSACTION_DATE" 
+            name="transaction_date" 
             className="ppf-input" 
-            value={formData.TRANSACTION_DATE}
+            value={formData.transaction_date}
             onChange={handleChange}
             required 
           />
@@ -102,6 +138,11 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           type="submit" 
           className="ppf-button-primary" 
           disabled={loading}
+          style={{ 
+            marginTop: '1rem',
+            backgroundColor: formData.transaction_type === 'income' ? '#059669' : 
+                             formData.transaction_type === 'saving' ? '#7c3aed' : '#dc2626'
+          }}
         >
           {loading ? 'Procesando...' : 'Guardar Transacción'}
         </button>

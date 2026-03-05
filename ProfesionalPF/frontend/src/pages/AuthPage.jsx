@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
+/**
+ * AuthPage: Maneja el ingreso y registro de usuarios.
+ * Incluye correcciones para navegación y depuración de errores de servidor.
+ */
 const AuthPage = () => {
+  const navigate = useNavigate(); // Inicialización necesaria para la redirección
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,27 +30,44 @@ const AuthPage = () => {
     const API_URL = import.meta.env.VITE_API_URL;
 
     try {
-      if (!isLogin) {
-        const response = await axios.post(`${API_URL}/users/signup`, formData);
-        alert(response.data.message);
+      const endpoint = isLogin ? '/users/login' : '/users/signup';
+      // Realizamos la petición al backend
+      const response = await axios.post(`${API_URL}${endpoint}`, formData);
+      
+      if (isLogin) {
+        // Guardamos la sesión de forma persistente
+        localStorage.setItem('ppf_session', JSON.stringify(response.data.user));
+        
+        // Redirección fluida al Dashboard (Home)
+        navigate('/home'); 
       } else {
-        alert("Lógica de Login (Fase 3.3) en proceso de validación de hash...");
+        alert("¡Registro exitoso! Ya puedes iniciar sesión.");
+        setIsLogin(true);
       }
     } catch (error) {
-      alert("Error: " + (error.response?.data?.error || "Servidor no disponible"));
-    } finally { setLoading(false); }
+      // Depuración detallada para el error "Servidor no disponible"
+      console.error("Detalle del error Axios:", error);
+
+      if (error.response) {
+        // El servidor respondió con un error (401, 404, 500)
+        alert(`Error: ${error.response.data.error || 'Credenciales inválidas'}`);
+      } else if (error.request) {
+        // La petición se hizo pero no hubo respuesta (Posible error de CORS o URL mal configurada)
+        alert("Error de red: El servidor no responde. Verifica que el Backend esté encendido y el CORS configurado.");
+      } else {
+        alert("Error crítico: " + error.message);
+      }
+    } finally { 
+      setLoading(false); 
+    }
   };
 
-  // Autenticación Social (Fase 3.3)
   const handleGoogleLogin = () => {
     alert("Redirigiendo a Google OAuth 2.0...");
-    // Aquí se integra supabase.auth.signInWithOAuth({ provider: 'google' })
   };
 
   return (
     <div className="ppf-auth-layout"> 
-      {/* Clase CSS con width: 200% y min-height: 1vh definida en global.css */}
-      
       <motion.div 
         layout
         initial={{ opacity: 0, scale: 0.9 }}
@@ -57,24 +80,39 @@ const AuthPage = () => {
         </h2>
 
         <form className="ppf-form" onSubmit={handleSubmit}>
-          {!isLogin && (
-            <div className="ppf-form__group">
-              <label className="ppf-label">Nombre Completo</label>
-              <input type="text" name="FULL_NAME" className="ppf-input" onChange={handleChange} required />
-            </div>
-          )}
+          <AnimatePresence mode='wait'>
+            {!isLogin && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="ppf-form__group"
+              >
+                <label className="ppf-label">Nombre Completo</label>
+                <input type="text" name="FULL_NAME" className="ppf-input" onChange={handleChange} required={!isLogin} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="ppf-form__group" style={{ marginTop: '1rem' }}>
             <label className="ppf-label">Correo Electrónico</label>
             <input type="email" name="EMAIL" className="ppf-input" onChange={handleChange} required />
           </div>
 
-          {!isLogin && (
-            <div className="ppf-form__group" style={{ marginTop: '1rem' }}>
-              <label className="ppf-label">Fecha de Nacimiento</label>
-              <input type="date" name="BIRTH_DATE" className="ppf-input" onChange={handleChange} required />
-            </div>
-          )}
+          <AnimatePresence mode='wait'>
+            {!isLogin && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="ppf-form__group" 
+                style={{ marginTop: '1rem' }}
+              >
+                <label className="ppf-label">Fecha de Nacimiento</label>
+                <input type="date" name="BIRTH_DATE" className="ppf-input" onChange={handleChange} required={!isLogin} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="ppf-form__group" style={{ marginTop: '1rem' }}>
             <label className="ppf-label">Contraseña</label>
@@ -95,7 +133,6 @@ const AuthPage = () => {
           </button>
         </form>
 
-        {/* Divisor Social (Fase 3.3) */}
         <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
           <hr style={{ flex: 1, border: '0.1px solid var(--ppf-color-border)' }} />
           <span style={{ margin: '0 10px', fontSize: '10px', color: 'var(--ppf-color-text-muted)' }}>O</span>

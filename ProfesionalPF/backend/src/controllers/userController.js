@@ -64,4 +64,26 @@ const getUserProfile = async (req, res) => {
     }
 };
 
-module.exports = { signupUser, getUserProfile };
+const loginUser = async (req, res) => {
+    const { EMAIL, PASSWORD } = req.body;
+    try {
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', EMAIL)
+            .single();
+
+        if (error || !user) return res.status(401).json({ error: "Credenciales inválidas" });
+
+        const isMatch = await bcrypt.compare(PASSWORD, user.password_hash);
+        if (!isMatch) return res.status(401).json({ error: "Credenciales inválidas" });
+
+        res.json({
+            message: "Login exitoso",
+            user: { id: user.user_id, name: user.full_name, email: user.email }
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Error en el servidor" });
+    }
+};
+module.exports = { signupUser, loginUser, getUserProfile };
