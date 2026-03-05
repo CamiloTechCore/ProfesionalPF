@@ -1,76 +1,42 @@
-const supabase = require('../config/supabase');
-
-const createTransaction = async (req, res) => {
-  const { USER_ID, AMOUNT_COP, TRANSACTION_TYPE, CATEGORY, TRANSACTION_DATE, DESCRIPTION } = req.body;
-
-  try {
-    const { data, error } = await supabase
-      .from('TRANSACTIONS')
-      .insert([{
-        USER_ID,
-        AMOUNT_COP: parseFloat(AMOUNT_COP),
-        TRANSACTION_TYPE,
-        CATEGORY,
-        TRANSACTION_DATE,
-        DESCRIPTION: DESCRIPTION || `Registro de ${CATEGORY}`
-      }])
-      .select();
-
-    if (error) throw error;
-
-    res.status(201).json({
-      message: "Transacción guardada en el motor financiero",
-      transaction: data[0]
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-/**
- * Motor de Saldos: Calcula el balance neto del usuario.
- */
+/* SECCIÓN: MOTOR DE SALDOS (getNetBalance) [cite: 10, 11] */
 const getNetBalance = async (req, res) => {
     const { userId } = req.params;
-
     try {
-        // 1. Obtener todos los movimientos del usuario
         const { data: transactions, error } = await supabase
             .from('transactions')
-            .select('amount, type')
+            .select('amount_cop, transaction_type') // Nombres de columna reales
             .eq('user_id', userId);
 
         if (error) throw error;
 
-        // 2. Ejecutar el cálculo dinámico
-        const balance = transactions.reduce((acc, current) => {
-            return current.type === 'income' 
-                ? acc + parseFloat(current.amount) 
-                : acc - parseFloat(current.amount);
-        }, 0);
+        // Desglose para las tarjetas de Ingresos y Gastos
+        const summary = transactions.reduce((acc, curr) => {
+            const amount = parseFloat(curr.amount_cop);
+            if (curr.transaction_type === 'income') acc.income += amount;
+            else if (curr.transaction_type === 'expense') acc.expense += amount;
+            return acc;
+        }, { income: 0, expense: 0 });
 
         res.json({
             user_id: userId,
-            net_balance: balance,
-            total_transactions: transactions.length,
-            currency: 'COP'
+            total_income: summary.income,
+            total_expense: summary.expense,
+            net_balance: summary.income - summary.expense
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-/**
- * Registro de nuevo movimiento (Ingreso/Gasto)
- */
+/* SECCIÓN: REGISTRO DE MOVIMIENTOS (addTransaction) [cite: 16] */
 const addTransaction = async (req, res) => {
     const { user_id, amount_cop, transaction_type, category, description, transaction_date } = req.body;
-
     try {
         const { data, error } = await supabase
             .from('transactions')
             .insert([{
                 user_id,
-                amount_cop,
+                amount_cop: parseFloat(amount_cop),
                 transaction_type,
                 category,
                 description,
@@ -79,10 +45,10 @@ const addTransaction = async (req, res) => {
             .select();
 
         if (error) throw error;
-        res.status(201).json({ message: "Movimiento registrado", data: data[0] });
+        res.status(201).json({ message: "Éxito", data: data[0] });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-module.exports = { createTransaction, getNetBalance , addTransaction };
+module.exports = { getNetBalance, addTransaction, getCategorySummary: require('./getCategorySummary') };

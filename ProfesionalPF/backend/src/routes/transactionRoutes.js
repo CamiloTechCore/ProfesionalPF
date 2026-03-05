@@ -1,14 +1,15 @@
+// SECCIÓN: REGISTRO DE RUTAS FINANCIERAS
 const express = require('express');
 const router = express.Router();
-const { createTransaction } = require('../controllers/transactionController');
-const { getNetBalance, addTransaction } = require('../controllers/transactionController');
+const { getNetBalance, addTransaction, getCategorySummary } = require('../controllers/transactionController');
 
-// POST /api/transactions
-router.post('/', createTransaction);
-
-
-// Ruta para obtener el saldo en tiempo real
+// Ruta para obtener el saldo neto (Motor 4.2)
 router.get('/balance/:userId', getNetBalance);
+
+// Ruta para el resumen de categorías (Motor 5.1 - Resuelve error 404)
+router.get('/summary/:userId', getCategorySummary);
+
+// Ruta para agregar transacciones
 router.post('/add', addTransaction);
 
 module.exports = router;
