@@ -1,114 +1,150 @@
-/* SECCIÓN: VARIABLES Y TOKENS  */
+/* ==========================================================================
+   1. VARIABLES GLOBALES Y RESET
+   ========================================================================== */
 :root {
-  --ppf-color-primary: #2563eb; /* Azul original conservado [cite: 58] */
-  --ppf-color-ingresos: #059669;
-  --ppf-color-gastos: #dc2626;
-  --ppf-color-bg: #f8fafc;
-  --ppf-radius-lg: 1.25rem;
-  --ppf-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  /* Paleta de Colores Moderna */
+  --ppf-color-primary: #1d4ed8;       /* Azul vibrante */
+  --ppf-color-primary-hover: #1e40af; /* Azul oscuro */
+  --ppf-color-ingresos: #10b981;      /* Verde esmeralda */
+  --ppf-color-gastos: #ef4444;        /* Rojo rosado */
+  --ppf-color-saving: #8b5cf6;        /* Violeta */
+  
+  /* Tonos de Gris y Fondo */
+  --ppf-color-bg: #f3f4f6;            /* Gris muy claro */
+  --ppf-color-card: #ffffff;          /* Blanco puro */
+  --ppf-color-text: #1f2937;          /* Gris oscuro */
+  --ppf-color-text-muted: #6b7280;    /* Gris medio */
+  --ppf-color-border: #e5e7eb;        /* Gris borde claro */
+  
+  /* Espaciado y Bordes */
+  --ppf-spacing-xs: 0.5rem;
+  --ppf-spacing-sm: 1rem;
+  --ppf-spacing-md: 1.5rem;
+  --ppf-spacing-lg: 2rem;
+  --ppf-radius-md: 12px;
+  --ppf-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ppf-transition: all 0.3s ease;
+  
+  /* Tipografía Base */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* SECCIÓN: CONTENEDOR MAESTRO RESPONSIVO */
-.ppf-app-container {
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--ppf-color-bg);
+  color: var(--ppf-color-text);
   min-height: 100vh;
-  padding: 2rem;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ppf-color-text);
+}
+
+/* ==========================================================================
+   2. LAYOUT Y CONTENEDORES MAESTROS
+   ========================================================================== */
+.ppf-app-container {
+  width: 100%;
+  padding: var(--ppf-spacing-lg);
   display: flex;
   justify-content: center;
-  background-color: var(--ppf-color-bg);
-  /* Fondo radial solicitado [cite: 64] */
-  background-image: radial-gradient(at 0% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%);
+}
+
+.ppf-auth-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: var(--ppf-spacing-md);
 }
 
 .ppf-main-content {
   width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
-/* SECCIÓN: TARJETAS CON TEXTO NEGRO [cite: 71] */
-.ppf-card {
-  background: #ffffff;
-  border-radius: var(--ppf-radius-lg);
-  padding: 1.5rem;
-  box-shadow: var(--ppf-shadow);
-  border: 1px solid #e2e8f0;
-  color: #000000 !important; /* Texto negro para tarjetas solicitado */
-}
-
-.ppf-card h2, .ppf-card h3, .ppf-card p, .ppf-card span {
-  color: #000000 !important; /* Garantiza legibilidad total */
-}
-
-.ppf-title-blue {
-  color: var(--ppf-color-primary) !important; /* Azul conservado para títulos */
-  font-weight: 800;
-}
-
-/* SECCIÓN: GRID DEL DASHBOARD */
 .ppf-dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--ppf-spacing-md);
+  margin-top: var(--ppf-spacing-lg);
 }
 
-/* SECCIÓN: FORMULARIOS */
-.ppf-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.ppf-dashboard-grid--split {
+  grid-template-columns: 1.5fr 1fr;
 }
 
-.ppf-form__group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+@media (max-width: 1024px) {
+  .ppf-dashboard-grid--split {
+    grid-template-columns: 1fr;
+  }
 }
 
-.ppf-label {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #000000;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* ==========================================================================
+   3. COMPONENTES: CARDS (TARJETAS)
+   ========================================================================== */
+.ppf-card {
+  background: var(--ppf-color-card);
+  border-radius: var(--ppf-radius-md);
+  padding: var(--ppf-spacing-lg);
+  box-shadow: var(--ppf-shadow-md);
+  border: 1px solid var(--ppf-color-border);
+  transition: var(--ppf-transition);
 }
 
-.ppf-input {
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: var(--ppf-radius-lg);
-  font-size: 1rem;
-  background-color: #ffffff;
-  color: #000000;
-  transition: border-color 0.2s ease;
+.ppf-card--translucent {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.95);
 }
 
-.ppf-input:focus {
-  outline: none;
-  border-color: var(--ppf-color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.ppf-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.ppf-input[type="checkbox"] {
-  width: auto;
-  margin-right: 0.5rem;
+/* Variaciones de Color para Cards */
+.ppf-card--income {
+  border-left: 5px solid var(--ppf-color-ingresos);
 }
 
+.ppf-card--expense {
+  border-left: 5px solid var(--ppf-color-gastos);
+}
+
+.ppf-card--balance {
+  border-left: 5px solid var(--ppf-color-primary);
+}
+
+/* ==========================================================================
+   4. COMPONENTES: BOTONES
+   ========================================================================== */
 .ppf-button-primary {
-  padding: 0.75rem 1.5rem;
-  background-color: var(--ppf-color-primary);
-  color: #ffffff;
+  padding: 14px 24px;
+  border-radius: 8px;
   border: none;
-  border-radius: var(--ppf-radius-lg);
   font-size: 1rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: var(--ppf-transition);
 }
 
-.ppf-button-primary:hover:not(:disabled) {
-  background-color: #1d4ed8;
+.ppf-button-primary:not(.ppf-button--dynamic) {
+  background-color: var(--ppf-color-primary);
+  color: white;
+}
+
+.ppf-button-primary:not(.ppf-button--dynamic):hover {
+  background-color: var(--ppf-color-primary-hover);
 }
 
 .ppf-button-primary:disabled {
@@ -116,187 +152,131 @@
   cursor: not-allowed;
 }
 
-.ppf-text-muted {
-  color: #6b7280;
+/* Botón Dinámico de Transacción */
+.ppf-button--dynamic.ppf-income {
+  background-color: var(--ppf-color-ingresos);
+  color: white;
+}
+.ppf-button--dynamic.ppf-saving {
+  background-color: var(--ppf-color-saving);
+  color: white;
+}
+.ppf-button--dynamic.ppf-expense {
+  background-color: var(--ppf-color-gastos);
+  color: white;
 }
 
-/* SECCIÓN: AUTENTICACIÓN */
-.ppf-auth-layout {
-  min-height: 100vh;
+/* ==========================================================================
+   5. COMPONENTES: FORMULARIOS
+   ========================================================================== */
+.ppf-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--ppf-color-bg);
-  background-image: radial-gradient(at 0% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%);
+  flex-direction: column;
+  gap: var(--ppf-spacing-sm);
 }
 
-.ppf-card--translucent {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+.ppf-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppf-spacing-xs);
 }
 
-/* SECCIÓN: COMPONENTES ESPECÍFICOS */
-.ppf-chart-container {
-  height: 450px;
+.ppf-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ppf-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ppf-input {
   width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--ppf-color-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--ppf-color-text);
+  box-sizing: border-box;
+  transition: var(--ppf-transition);
 }
 
-.ppf-chart-title {
-  margin-bottom: 20px;
+.ppf-input:focus {
+  outline: none;
+  border-color: var(--ppf-color-primary);
+  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
 }
 
-.ppf-no-data {
-  height: 100%;
+.ppf-form__row {
   display: flex;
+  gap: var(--ppf-spacing-sm);
   align-items: center;
-  justify-content: center;
-  color: #000000;
 }
 
+/* ==========================================================================
+   6. TIPOGRAFÍA Y OTROS DETALLES
+   ========================================================================== */
 .ppf-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  padding-bottom: var(--ppf-spacing-md);
+  border-bottom: 2px solid var(--ppf-color-border);
 }
 
-.ppf-title-large {
-  font-size: 2.4rem;
+.ppf-title-blue {
+  color: var(--ppf-color-primary);
+  font-size: 2.2rem;
+  margin: 0;
 }
 
-.ppf-card-income {
-  border-top: 5px solid var(--ppf-color-ingresos);
-}
-
-.ppf-card-expense {
-  border-top: 5px solid var(--ppf-color-gastos);
-}
-
-.ppf-card-balance {
-  border-top: 5px solid var(--ppf-color-primary);
-}
-
-.ppf-financial-amount {
-  font-size: 2rem;
-  margin: 0.5rem 0;
-}
-
-.ppf-financial-amount-large {
+.ppf-label-value {
   font-size: 2.5rem;
-  margin: 0.5rem 0;
+  font-weight: 800;
+  margin: var(--ppf-spacing-xs) 0;
 }
 
-.ppf-financial-subtitle {
-  color: #000000;
+.ppf-text-muted {
+  color: var(--ppf-color-text-muted);
   font-size: 0.9rem;
-  margin: 0.25rem 0;
 }
 
-.ppf-dashboard-split {
-  grid-template-columns: 1.5fr 1fr;
+.ppf-text-muted strong {
+  color: var(--ppf-color-text);
 }
 
-.ppf-form-title {
-  color: var(--ppf-color-primary);
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-}
-
-.ppf-form-submit {
-  margin-top: 1rem;
-}
-
-.ppf-form-submit--income {
-  background-color: var(--ppf-color-ingresos);
-}
-
-.ppf-form-submit--saving {
-  background-color: #7c3aed;
-}
-
-.ppf-form-submit--expense {
-  background-color: var(--ppf-color-gastos);
-}
-
-.ppf-auth-title {
+.ppf-text-footer {
   text-align: center;
-  color: var(--ppf-color-primary);
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  margin-top: var(--ppf-spacing-md);
+  font-size: 0.9rem;
+  color: var(--ppf-color-text);
 }
 
-.ppf-auth-divider {
+.ppf-link {
+  color: var(--ppf-color-primary);
+  cursor: pointer;
+  margin-left: var(--ppf-spacing-xs);
+  font-weight: 600;
+}
+
+.ppf-chart-container {
+  height: 400px;
+}
+
+.ppf-chart-title {
+  margin-bottom: var(--ppf-spacing-lg);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.ppf-empty-state {
+  height: 100%;
   display: flex;
   align-items: center;
-  margin: 20px 0;
-}
-
-.ppf-auth-divider hr {
-  flex: 1;
-  border: 0.1px solid #d1d5db;
-}
-
-.ppf-auth-divider span {
-  margin: 0 10px;
-  font-size: 10px;
-  color: #6b7280;
-}
-
-.ppf-google-button {
-  display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: var(--ppf-radius-lg);
-  padding: 0.75rem;
-  transition: border-color 0.2s ease;
+  color: var(--ppf-color-text-muted);
 }
-
-.ppf-google-button:hover {
-  border-color: var(--ppf-color-primary);
-}
-
-.ppf-auth-footer {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 0.85rem;
-  color: #000000;
-}
-
-.ppf-auth-link {
-  color: var(--ppf-color-primary);
-  cursor: pointer;
-  margin-left: 5px;
-  font-weight: bold;
-}
-
-.ppf-auth-link:hover {
-  text-decoration: underline;
-}
-
-.ppf-checkbox-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-  align-items: flex-start;
-}
-
-.ppf-margin-top {
-  margin-top: 1rem;
-}
-
-.ppf-margin-top-small {
-  margin-top: 20px;
-}
-
-.ppf-button-logout {
-  padding: 10px 20px;
-}
-
-.ppf-auth-card {
-  width: 100%;
-  max-width: 500px;
+.ppf-welcome-message {
+  font-size: 20PX;
+  color: black;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
