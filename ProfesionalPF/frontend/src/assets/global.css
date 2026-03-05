@@ -1,7 +1,6 @@
 /**
  * P-PF - Estilos globales
- * Variables de diseño y estilos base para toda la aplicación.
- * Convención: prefijo ppf- para identificar componentes propios.
+ * Professional & Personal Finances
  */
 
 /* ==========================================================================
@@ -18,7 +17,7 @@
   --ppf-color-ahorro: #7c3aed;
 
   /* Neutros */
-  --ppf-color-bg: #f1f5f9; /* Un poco más oscuro para resaltar el efecto cristal */
+  --ppf-color-bg: #f8fafc; 
   --ppf-color-card: #ffffff;
   --ppf-color-text: #1e293b;
   --ppf-color-text-muted: #64748b;
@@ -35,18 +34,14 @@
   --ppf-radius-sm: 0.375rem;
   --ppf-radius-md: 0.5rem;
   --ppf-radius-lg: 0.75rem;
-  --ppf-radius-xl: 1rem;
 
   /* Sombras */
-  --ppf-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --ppf-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --ppf-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
 
   /* Tipografía */
   --ppf-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --ppf-text-sm: 0.875rem;
   --ppf-text-base: 1rem;
-  --ppf-text-lg: 1.125rem;
-  --ppf-text-2xl: 1.5rem;
 }
 
 /* ==========================================================================
@@ -60,74 +55,54 @@
 body {
   margin: 0;
   font-family: var(--ppf-font-sans);
-  font-size: var(--ppf-text-base);
-  color: var(--ppf-text-text);
   background-color: var(--ppf-color-bg);
-  /* Fondo con un toque sutil de gradiente para el modo moderno */
-  background-image: radial-gradient(at 0% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
-                    radial-gradient(at 50% 0%, hsla(225,39%,20%,0.05) 0, transparent 50%);
-  line-height: 1.5;
+  /* Fondo radial suave para resaltar la profundidad del modal */
+  background-image: radial-gradient(at 0% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
+                    radial-gradient(at 50% 0%, hsla(225,39%,20%,0.03) 0, transparent 50%);
   min-height: 100vh;
 }
 
 /* ==========================================================================
-   COMPONENTES CORE (Prefijo ppf-)
+   LAYOUT PRINCIPAL (Centrado y Balance Vertical)
    ========================================================================== */
 
-/* --- Navegación --- */
-.ppf-nav {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--ppf-color-border);
-  padding: var(--ppf-spacing-md) var(--ppf-spacing-xl);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.ppf-nav__list {
+.ppf-main-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--ppf-spacing-lg);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  min-height: 1vh;
+  width: 200%;
+ justify-content: center;
+ margin-left: 300px;
+
 }
 
-.ppf-nav__link {
-  color: var(--ppf-color-text);
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s;
+
+.app-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-.ppf-nav__link:hover {
-  color: var(--ppf-color-primary);
-}
+/* ==========================================================================
+   COMPONENTES (Glassmorphism & Card)
+   ========================================================================== */
 
-/* --- Tarjetas y Modales (Efecto Glassmorphism) --- */
 .ppf-card {
   background: var(--ppf-color-card);
   border-radius: var(--ppf-radius-lg);
-  border: 1px solid var(--ppf-color-border);
-  box-shadow: var(--ppf-shadow-md);
-  padding: var(--ppf-spacing-lg);
-}
-
-.ppf-card--translucent {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: var(--ppf-spacing-xl);
+  width: 100%;
+  max-width: 420px; /* Tamaño ideal para escritorio */
   box-shadow: var(--ppf-shadow-lg);
 }
 
-/* --- Formularios --- */
+/* Formularios */
 .ppf-form {
   display: flex;
   flex-direction: column;
   gap: var(--ppf-spacing-md);
+  text-align: left;
 }
 
 .ppf-form__group {
@@ -142,13 +117,15 @@ body {
   color: var(--ppf-color-text-muted);
 }
 
+/* Inputs con texto oscuro para garantizar legibilidad */
 .ppf-input {
   width: 100%;
   padding: 0.75rem var(--ppf-spacing-md);
   border: 1px solid var(--ppf-color-border);
   border-radius: var(--ppf-radius-md);
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
   font-size: var(--ppf-text-base);
+  color: #1e293b !important; /* Forza la visibilidad del texto */
   transition: all 0.2s ease;
 }
 
@@ -158,11 +135,11 @@ body {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* --- Botones --- */
+/* Botones */
 .ppf-button-primary {
   background-color: var(--ppf-color-primary);
   color: #ffffff;
-  padding: 0.75rem var(--ppf-spacing-lg);
+  padding: 0.85rem;
   border-radius: var(--ppf-radius-md);
   border: none;
   font-weight: 600;
@@ -178,13 +155,28 @@ body {
   transform: scale(0.98);
 }
 
-/* --- Utilidades --- */
+/* ==========================================================================
+   UTILIDADES Y RESPONSIVE
+   ========================================================================== */
+
 .ppf-text-muted { color: var(--ppf-color-text-muted); }
+
 .ppf-status-dot {
-  height: 10px;
-  width: 10px;
+  height: 8px;
+  width: 8px;
   background-color: #22c55e;
   border-radius: 50%;
   display: inline-block;
-  margin-right: 5px;
+  margin-right: 6px;
+}
+
+.ppf-auth-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 1vh; /* Altura mínima solicitada */
+  width: 200%;     /* Ancho solicitado */
+  padding: 4rem var(--ppf-spacing-lg);
+  gap: var(--ppf-spacing-xl);
 }

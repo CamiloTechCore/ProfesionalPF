@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser } = require('../controllers/userController');
+// Importamos solo la función que definimos en el controlador
+const { signupUser, getUserProfile } = require('../controllers/userController');
+// Importamos el middleware de protección legal
 const { checkHabeasData } = require('../middleware/habeasData');
 
-// Ruta: POST /api/users/signup
-router.post('/signup', checkHabeasData, registerUser);
+
+// 2. Luego ejecuta el controlador (guarda en la DB)
+router.post('/signup', checkHabeasData, signupUser);
+router.get('/profile/:userId', getUserProfile);
 
 module.exports = router;
