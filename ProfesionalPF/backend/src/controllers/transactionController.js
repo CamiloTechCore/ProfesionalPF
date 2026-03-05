@@ -51,4 +51,32 @@ const addTransaction = async (req, res) => {
     }
 };
 
-module.exports = { getNetBalance, addTransaction, getCategorySummary: require('./getCategorySummary') };
+const getCategorySummary = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const { data: transactions, error } = await supabase
+            .from('transactions')
+            .select('category, amount_cop')
+            .eq('user_id', userId)
+            .eq('transaction_type', 'expense');
+
+        if (error) throw error;
+
+        const summary = transactions.reduce((acc, curr) => {
+            const cat = curr.category || 'Otros';
+            acc[cat] = (acc[cat] || 0) + parseFloat(curr.amount_cop);
+            return acc;
+        }, {});
+
+        const formattedData = Object.keys(summary).map(key => ({
+            name: key,
+            value: summary[key]
+        }));
+
+        res.json(formattedData);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { getNetBalance, addTransaction, getCategorySummary };
