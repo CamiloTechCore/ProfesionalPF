@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion'; // Corregida la importación
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
+/**
+ * TransactionForm: Registro inteligente de movimientos.
+ * Valida la existencia de userId para evitar registros huérfanos.
+ */
 const TransactionForm = ({ userId, onTransactionAdded }) => {
   const [loading, setLoading] = useState(false);
   
-  // Categorías según el Roadmap 4.2
   const categoriesMap = {
     income: ['Sueldo', 'Honorarios', 'Renta', 'Otros Ingresos'],
     expense: ['Vivienda', 'Alimentación', 'Transporte', 'Salud', 'Educación', 'Ocio'],
@@ -13,7 +16,7 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
   };
 
   const [formData, setFormData] = useState({
-    user_id: userId, // Minúsculas para coincidir con DB
+    user_id: userId, // Inicialización primaria
     amount_cop: '',
     transaction_type: 'expense',
     category: 'Vivienda',
@@ -21,7 +24,15 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
     description: ''
   });
 
-  // Efecto para resetear la categoría cuando cambia el tipo de movimiento
+  // SECCIÓN: SINCRONIZADOR DE IDENTIDAD
+  // Si el prop userId cambia (por carga asíncrona en el Home), actualizamos el estado interno
+  useEffect(() => {
+    if (userId) {
+      setFormData(prev => ({ ...prev, user_id: userId }));
+    }
+  }, [userId]);
+
+  // Efecto para resetear la categoría según el tipo de movimiento
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
@@ -31,25 +42,40 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Mantenemos los nombres en minúsculas para coincidir con el esquema DB
     setFormData(prev => ({ ...prev, [name.toLowerCase()]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (parseFloat(formData.amount_cop) <= 0) return alert("El monto debe ser mayor a cero");
+
+    // GUARDIA 1: Validación de monto
+    if (parseFloat(formData.amount_cop) <= 0) {
+      return alert("El monto debe ser mayor a cero");
+    }
+
+    // GUARDIA 2: Validación de sesión (Evita el error NULL en DB)
+    if (!formData.user_id) {
+      return alert("Error de sesión: No se detectó ID de usuario. Por favor, reingresa.");
+    }
 
     setLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL;
-      // Endpoint corregido según tu estructura de backend
+      
+      // Enviamos el objeto completo asegurando que user_id no sea nulo
       await axios.post(`${API_URL}/transactions/add`, formData); 
       
       alert("Transacción registrada correctamente");
       
-      if (onTransactionAdded) onTransactionAdded(); // Callback para refrescar el Dashboard
+      if (onTransactionAdded) onTransactionAdded();
       
-      // Limpiar solo los campos variables
-      setFormData(prev => ({ ...prev, amount_cop: '', description: '' }));
+      // Limpiamos campos, pero PRESERVAMOS el user_id para el siguiente registro
+      setFormData(prev => ({ 
+        ...prev, 
+        amount_cop: '', 
+        description: '' 
+      }));
     } catch (error) {
       alert("Error al registrar: " + (error.response?.data?.error || "Error de red"));
     } finally {
@@ -63,11 +89,12 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
       animate={{ opacity: 1, scale: 1 }}
       className="ppf-card ppf-card--translucent"
     >
-      <h3 style={{ color: 'var(--ppf-color-primary)', marginBottom: 'var(--ppf-spacing-md)' }}>
+      <h3 className="ppf-title-blue" style={{ marginBottom: '1.5rem', fontSize: '1.4rem' }}>
         Nuevo Registro Manual
       </h3>
       
       <form className="ppf-form" onSubmit={handleSubmit}>
+        {/* TIPO DE MOVIMIENTO */}
         <div className="ppf-form__group">
           <label className="ppf-label">TIPO DE MOVIMIENTO</label>
           <select 
@@ -82,6 +109,7 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           </select>
         </div>
 
+        {/* VALOR COP */}
         <div className="ppf-form__group">
           <label className="ppf-label">VALOR EN PESOS (COP)</label>
           <input 
@@ -95,6 +123,7 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           />
         </div>
 
+        {/* CATEGORÍA */}
         <div className="ppf-form__group">
           <label className="ppf-label">CATEGORÍA</label>
           <select 
@@ -109,6 +138,7 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           </select>
         </div>
 
+        {/* DESCRIPCIÓN */}
         <div className="ppf-form__group">
           <label className="ppf-label">DESCRIPCIÓN</label>
           <input 
@@ -122,6 +152,7 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           />
         </div>
 
+        {/* FECHA */}
         <div className="ppf-form__group">
           <label className="ppf-label">FECHA</label>
           <input 
@@ -134,6 +165,7 @@ const TransactionForm = ({ userId, onTransactionAdded }) => {
           />
         </div>
 
+        {/* BOTÓN DINÁMICO */}
         <button 
           type="submit" 
           className="ppf-button-primary" 

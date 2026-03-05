@@ -8,6 +8,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const configRoutes = require('./routes/configRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const savingsRoutes = require('./routes/savingsRoutes');
 
 const app = express();
 
@@ -19,8 +20,10 @@ app.use(express.json());
 
 // --- 3. REGISTRO DE RUTAS ---
 app.use('/api/users', userRoutes);
-app.use('/api/config', configRoutes); // <--- AHORA SÍ FUNCIONARÁ
-app.use('/api/transactions', transactionRoutes); // <--- REGISTRO PARA LA FASE 4
+app.use('/api/config', configRoutes); 
+app.use('/api/transactions', transactionRoutes); 
+// Registramos el prefijo. La ruta /goal/:userId ya vive dentro de savingsRoutes
+app.use('/api/savings', savingsRoutes);
 
 // --- 4. RUTA DE PRUEBA ---
 app.get('/', (req, res) => {

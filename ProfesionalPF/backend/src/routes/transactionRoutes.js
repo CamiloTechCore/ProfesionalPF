@@ -1,15 +1,17 @@
-// SECCIÓN: REGISTRO DE RUTAS FINANCIERAS
 const express = require('express');
 const router = express.Router();
-const { getNetBalance, addTransaction, getCategorySummary } = require('../controllers/transactionController');
+// Importamos la nueva función del controlador
+const { 
+    getNetBalance, 
+    addTransaction, 
+    getCategorySummary, 
+    getTransactionHistory 
+} = require('../controllers/transactionController');
 
-// Ruta para obtener el saldo neto (Motor 4.2)
 router.get('/balance/:userId', getNetBalance);
-
-// Ruta para el resumen de categorías (Motor 5.1 - Resuelve error 404)
 router.get('/summary/:userId', getCategorySummary);
-
-// Ruta para agregar transacciones
+// NUEVA RUTA: Resuelve el error 404 /api/transactions/history/:userId
+router.get('/history/:userId', getTransactionHistory); 
 router.post('/add', addTransaction);
 
 module.exports = router;

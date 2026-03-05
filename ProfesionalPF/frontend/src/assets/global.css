@@ -94,10 +94,10 @@ h1, h2, h3, h4 {
 .ppf-card {
   background: var(--ppf-color-card);
   border-radius: var(--ppf-radius-md);
-  padding: var(--ppf-spacing-lg);
   box-shadow: var(--ppf-shadow-md);
   border: 1px solid var(--ppf-color-border);
   transition: var(--ppf-transition);
+  padding: 10%;
 }
 
 .ppf-card--translucent {
