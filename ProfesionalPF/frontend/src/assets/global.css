@@ -1,22 +1,19 @@
 /* ==========================================================================
-   1. VARIABLES GLOBALES Y RESET
+   1. VARIABLES Y RESET
    ========================================================================== */
 :root {
-  /* Paleta de Colores Moderna */
-  --ppf-color-primary: #1d4ed8;       /* Azul vibrante */
-  --ppf-color-primary-hover: #1e40af; /* Azul oscuro */
-  --ppf-color-ingresos: #10b981;      /* Verde esmeralda */
-  --ppf-color-gastos: #ef4444;        /* Rojo rosado */
-  --ppf-color-saving: #8b5cf6;        /* Violeta */
+  --ppf-color-primary: #1d4ed8;
+  --ppf-color-primary-hover: #1e40af;
+  --ppf-color-ingresos: #10b981;
+  --ppf-color-gastos: #ef4444;
+  --ppf-color-saving: #8b5cf6;
   
-  /* Tonos de Gris y Fondo */
-  --ppf-color-bg: #f3f4f6;            /* Gris muy claro */
-  --ppf-color-card: #ffffff;          /* Blanco puro */
-  --ppf-color-text: #1f2937;          /* Gris oscuro */
-  --ppf-color-text-muted: #6b7280;    /* Gris medio */
-  --ppf-color-border: #e5e7eb;        /* Gris borde claro */
+  --ppf-color-bg: #f3f4f6;
+  --ppf-color-card: #ffffff;
+  --ppf-color-text: #1f2937;
+  --ppf-color-text-muted: #6b7280;
+  --ppf-color-border: #e5e7eb;
   
-  /* Espaciado y Bordes */
   --ppf-spacing-xs: 0.5rem;
   --ppf-spacing-sm: 1rem;
   --ppf-spacing-md: 1.5rem;
@@ -25,10 +22,8 @@
   --ppf-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --ppf-transition: all 0.3s ease;
   
-  /* Tipografía Base */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -40,46 +35,35 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4 {
-  margin: 0;
-  font-weight: 700;
-  color: var(--ppf-color-text);
-}
-
 /* ==========================================================================
-   2. LAYOUT Y CONTENEDORES MAESTROS
+   2. ESTRUCTURA Y LAYOUT
    ========================================================================== */
 .ppf-app-container {
   width: 100%;
   padding: var(--ppf-spacing-lg);
   display: flex;
   justify-content: center;
-}
-
-.ppf-auth-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  padding: var(--ppf-spacing-md);
+  box-sizing: border-box;
 }
 
 .ppf-main-content {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppf-spacing-lg); /* Espacio uniforme entre bloques principales */
 }
 
 .ppf-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--ppf-spacing-md);
-  margin-top: var(--ppf-spacing-lg);
 }
 
 .ppf-dashboard-grid--split {
   grid-template-columns: 1.5fr 1fr;
+  align-items: stretch; /* Iguala la altura del formulario y la gráfica */
 }
 
 @media (max-width: 1024px) {
@@ -89,7 +73,7 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
-   3. COMPONENTES: CARDS (TARJETAS)
+   3. TARJETAS (CARDS)
    ========================================================================== */
 .ppf-card {
   background: var(--ppf-color-card);
@@ -97,8 +81,11 @@ h1, h2, h3, h4 {
   box-shadow: var(--ppf-shadow-md);
   border: 1px solid var(--ppf-color-border);
   transition: var(--ppf-transition);
-  padding: 10%;
-  width: auto;
+  padding: var(--ppf-spacing-md);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .ppf-card--translucent {
@@ -108,72 +95,26 @@ h1, h2, h3, h4 {
 
 .ppf-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* Variaciones de Color para Cards */
-.ppf-card--income {
-  border-left: 5px solid var(--ppf-color-ingresos);
+.ppf-card--saving {
+  border-left: 5px solid var(--ppf-color-saving);
 }
 
-.ppf-card--expense {
-  border-left: 5px solid var(--ppf-color-gastos);
-}
-
-.ppf-card--balance {
-  border-left: 5px solid var(--ppf-color-primary);
-}
+.ppf-card--income { border-left: 5px solid var(--ppf-color-ingresos); }
+.ppf-card--expense { border-left: 5px solid var(--ppf-color-gastos); }
+.ppf-card--balance { border-left: 5px solid var(--ppf-color-primary); }
 
 /* ==========================================================================
-   4. COMPONENTES: BOTONES
-   ========================================================================== */
-.ppf-button-primary {
-  padding: 14px 24px;
-  border-radius: 8px;
-  border: none;
-  font-size: 1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: var(--ppf-transition);
-}
-
-.ppf-button-primary:not(.ppf-button--dynamic) {
-  background-color: var(--ppf-color-primary);
-  color: white;
-}
-
-.ppf-button-primary:not(.ppf-button--dynamic):hover {
-  background-color: var(--ppf-color-primary-hover);
-}
-
-.ppf-button-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Botón Dinámico de Transacción */
-.ppf-button--dynamic.ppf-income {
-  background-color: var(--ppf-color-ingresos);
-  color: white;
-}
-.ppf-button--dynamic.ppf-saving {
-  background-color: var(--ppf-color-saving);
-  color: white;
-}
-.ppf-button--dynamic.ppf-expense {
-  background-color: var(--ppf-color-gastos);
-  color: white;
-}
-
-/* ==========================================================================
-   5. COMPONENTES: FORMULARIOS
+   4. FORMULARIOS
    ========================================================================== */
 .ppf-form {
   display: flex;
   flex-direction: column;
   gap: var(--ppf-spacing-sm);
+  flex: 1; 
+  justify-content: center; /* Centra el contenido verticalmente para alinear con la gráfica */
 }
 
 .ppf-form__group {
@@ -182,21 +123,12 @@ h1, h2, h3, h4 {
   gap: var(--ppf-spacing-xs);
 }
 
-.ppf-label {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--ppf-color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
 .ppf-input {
   width: 100%;
   padding: 12px 16px;
   border: 2px solid var(--ppf-color-border);
   border-radius: 8px;
   font-size: 1rem;
-  color: var(--ppf-color-text);
   box-sizing: border-box;
   transition: var(--ppf-transition);
 }
@@ -207,14 +139,75 @@ h1, h2, h3, h4 {
   box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
 }
 
-.ppf-form__row {
-  display: flex;
-  gap: var(--ppf-spacing-sm);
-  align-items: center;
+/* ==========================================================================
+   5. COMPONENTES DE TABLA Y METAS
+   ========================================================================== */
+.ppf-savings-card-full {
+  grid-column: 1 / -1; /* Ocupa todo el ancho igual que el historial */
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--ppf-spacing-sm);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--ppf-color-border);
+}
+
+.ppf-progress-mini {
+  width: 100%;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ppf-progress-mini div {
+  height: 100%;
+  background-color: var(--ppf-color-primary);
+  transition: width 1s ease;
+}
+
+.ppf-tag {
+  background-color: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
 }
 
 /* ==========================================================================
-   6. TIPOGRAFÍA Y OTROS DETALLES
+   6. BOTONES
+   ========================================================================== */
+.ppf-button-primary {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--ppf-transition);
+  background-color: var(--ppf-color-primary);
+  color: white;
+}
+
+.ppf-button-primary:hover {
+  background-color: var(--ppf-color-primary-hover);
+}
+
+.ppf-button--dynamic.ppf-income { background-color: var(--ppf-color-ingresos); }
+.ppf-button--dynamic.ppf-expense { background-color: var(--ppf-color-gastos); }
+
+/* ==========================================================================
+   7. TIPOGRAFÍA Y UI
    ========================================================================== */
 .ppf-header {
   display: flex;
@@ -224,60 +217,9 @@ h1, h2, h3, h4 {
   border-bottom: 2px solid var(--ppf-color-border);
 }
 
-.ppf-title-blue {
-  color: var(--ppf-color-primary);
-  font-size: 2.2rem;
-  margin: 0;
-}
+.ppf-title-blue { color: var(--ppf-color-primary); font-size: 2rem; }
+.ppf-welcome-message { font-size: 1.1rem; color: #000; font-weight: 500; }
+.ppf-label { font-weight: 700; font-size: 0.75rem; color: var(--ppf-color-text-muted); letter-spacing: 0.5px; }
+.ppf-text-muted { color: var(--ppf-color-text-muted); font-size: 0.85rem; }
 
-.ppf-label-value {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: var(--ppf-spacing-xs) 0;
-}
-
-.ppf-text-muted {
-  color: var(--ppf-color-text-muted);
-  font-size: 0.9rem;
-}
-
-.ppf-text-muted strong {
-  color: var(--ppf-color-text);
-}
-
-.ppf-text-footer {
-  text-align: center;
-  margin-top: var(--ppf-spacing-md);
-  font-size: 0.9rem;
-  color: var(--ppf-color-text);
-}
-
-.ppf-link {
-  color: var(--ppf-color-primary);
-  cursor: pointer;
-  margin-left: var(--ppf-spacing-xs);
-  font-weight: 600;
-}
-
-.ppf-chart-container {
-  height: 400px;
-}
-
-.ppf-chart-title {
-  margin-bottom: var(--ppf-spacing-lg);
-  font-size: 1.1rem;
-  text-align: center;
-}
-
-.ppf-empty-state {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ppf-color-text-muted);
-}
-.ppf-welcome-message {
-  font-size: 20PX;
-  color: black;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
+.ppf-chart-container { height: 400px; display: flex; align-items: center; justify-content: center; }
