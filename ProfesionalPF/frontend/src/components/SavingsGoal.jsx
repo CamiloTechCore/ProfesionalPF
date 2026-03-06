@@ -34,15 +34,15 @@ const SavingsGoal = ({ goalData, userId, onGoalUpdated }) => {
       alert("Error: " + (error.response?.data?.error || "No se pudo guardar la meta"));
     }
   };
-
+//className="ppf-button-primary" style={{ backgroundColor: '#112fb4' }
   return (
     <div className="ppf-card" style={{ textAlign: 'left', minHeight: '220px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h4 className="ppf-label" style={{ color: '#000', margin: 0 }}>Meta de Ahorro Activa</h4>
         <button 
           onClick={() => setIsEditing(!isEditing)} 
-          className="ppf-text-muted" 
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline' }}
+          className="ppf-button-primary" 
+          style={{ backgroundColor: '#112fb4', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}
         >
           {isEditing ? 'Cancelar' : (goalData?.is_active ? 'Editar Meta' : 'Configurar')}
         </button>

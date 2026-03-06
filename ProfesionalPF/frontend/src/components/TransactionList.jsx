@@ -3,7 +3,7 @@ import React from 'react';
 
 const TransactionList = ({ transactions }) => {
   return (
-    <div className="ppf-card" style={{ marginTop: '2rem', width: '100%' }}>
+    <div className="ppf-card" style={{ marginTop: '2rem'}}>
       <h4 className="ppf-label" style={{ marginBottom: '1.5rem', textAlign: 'left', color: '#000' }}>
         HISTORIAL DE MOVIMIENTOS RECIENTES
       </h4>

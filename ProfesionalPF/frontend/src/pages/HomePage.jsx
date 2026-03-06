@@ -84,7 +84,7 @@ const HomePage = () => {
             <button onClick={downloadPDF} className="ppf-button-primary" style={{ backgroundColor: '#10b981' }}>
               DESCARGAR PDF
             </button>
-            <button onClick={() => { localStorage.clear(); navigate('/'); }} className="ppf-button-primary" style={{ backgroundColor: '#1e293b' }}>
+            <button onClick={() => { localStorage.clear(); navigate('/'); }} className="ppf-button-primary" style={{ backgroundColor: '#112fb4' }}>
               SALIR
             </button>
           </div>

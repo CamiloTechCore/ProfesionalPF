@@ -98,6 +98,7 @@ h1, h2, h3, h4 {
   border: 1px solid var(--ppf-color-border);
   transition: var(--ppf-transition);
   padding: 10%;
+  width: auto;
 }
 
 .ppf-card--translucent {
