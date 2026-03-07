@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
-// Importamos solo la función que definimos en el controlador
-const { signupUser, loginUser, getUserProfile } = require('../controllers/userController');// Importamos el middleware de protección legal
-const { checkHabeasData } = require('../middleware/habeasData');
+const { signupUser, loginUser, getUserProfile, googleAuth, updateUserProfile } = require('../controllers/userController');
 
 
-// 2. Luego ejecuta el controlador (guarda en la DB)
-router.post('/signup', checkHabeasData, signupUser);
+router.post('/signup', signupUser);
 router.post('/login', loginUser);
+router.post('/google-auth', googleAuth);
 router.get('/profile/:userId', getUserProfile);
+router.put('/update', updateUserProfile);
 
 module.exports = router;

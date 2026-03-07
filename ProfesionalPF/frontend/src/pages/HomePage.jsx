@@ -20,9 +20,8 @@ const HomePage = () => {
   const [chartData, setChartData] = useState([]);
   const [transactions, setTransactions] = useState([]); 
   const [savingsGoals, setSavingsGoals] = useState([]);
+  const [isProfileIncomplete, setIsProfileIncomplete] = useState(false); // 🚩 Estado para el banner
 
-  // --- LÓGICA DE CÁLCULO DE AHORRO TOTAL ---
-  // Sumamos el goal_amount de todas las metas activas
   const totalSaved = savingsGoals.reduce((acc, goal) => 
     acc + (parseFloat(goal.goal_amount) || 0), 0
   );
@@ -34,12 +33,13 @@ const HomePage = () => {
     if (!user) return;
     const API_URL = import.meta.env.VITE_API_URL;
     try {
-      const [resBalance, resTrm, resSummary, resHistory, resGoal] = await Promise.all([
+      const [resBalance, resTrm, resSummary, resHistory, resGoal, resProfile] = await Promise.all([
         axios.get(`${API_URL}/transactions/balance/${user.id}`),
         axios.get(`${API_URL}/config/trm`).catch(() => ({ data: { trm: 4000 } })),
         axios.get(`${API_URL}/transactions/summary/${user.id}`),
         axios.get(`${API_URL}/transactions/history/${user.id}`).catch(() => ({ data: [] })),
-        axios.get(`${API_URL}/savings/goal/${user.id}`).catch(() => ({ data: [] }))
+        axios.get(`${API_URL}/savings/goal/${user.id}`).catch(() => ({ data: [] })),
+        axios.get(`${API_URL}/users/profile/${user.id}`) // 🚩 Verificamos el perfil [cite: 9]
       ]);
 
       setFinancials({
@@ -52,15 +52,19 @@ const HomePage = () => {
       setChartData(resSummary.data || []);
       setTransactions(resHistory.data || []);
       setSavingsGoals(resGoal.data || []);
+      
+      // Si no hay birth_date, activamos el aviso [cite: 10, 11]
+      if (!resProfile.data.birth_date) {
+        setIsProfileIncomplete(true);
+      } else {
+        setIsProfileIncomplete(false);
+      }
 
     } catch (err) { 
       console.error("Error de sincronización:", err);
     }
   };
 
-  /**
-   * MOTOR DE EXPORTACIÓN PDF
-   */
   const downloadPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -82,7 +86,6 @@ const HomePage = () => {
     doc.save(`Reporte_PF_${user?.name}.pdf`);
   };
 
-  // CONTROL DE SESIÓN
   useEffect(() => {
     const session = localStorage.getItem('ppf_session');
     if (!session) navigate('/');
@@ -103,17 +106,26 @@ const HomePage = () => {
             <h1 className="ppf-title-blue">P&PF | Finances</h1>
             <p className="ppf-welcome-message">Bienvenido, <strong>{user?.name}</strong></p>
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={downloadPDF} className="ppf-button-primary" style={{ backgroundColor: '#10b981' }}>
-              DESCARGAR PDF
+          <div style={{ display: 'flex', gap: '0.8rem' }}>
+            <button onClick={() => navigate('/profile')} className="ppf-button-primary" style={{ backgroundColor: '#6366f1' }}>
+              MI PERFIL
             </button>
-            <button onClick={() => { localStorage.clear(); navigate('/'); }} className="ppf-button-primary">
+            <button onClick={downloadPDF} className="ppf-button-primary" style={{ backgroundColor: '#10b981' }}>
+              PDF
+            </button>
+            <button onClick={() => { localStorage.clear(); navigate('/'); }} className="ppf-button-primary" style={{ backgroundColor: '#ef4444' }}>
               SALIR
             </button>
           </div>
         </header>
 
-        {/* 1. TARJETAS DE RESUMEN (Ahora con 4 indicadores) */}
+        {isProfileIncomplete && (
+          <div className="ppf-alert-warning" onClick={() => navigate('/profile')} style={{ cursor: 'pointer', marginBottom: '1.5rem', padding: '1rem', borderRadius: '8px', borderLeft: '5px solid #f59e0b', backgroundColor: '#fffbeb' }}>
+            ⚠️ <strong>Perfil Incompleto:</strong> Por favor registra tu fecha de nacimiento para habilitar proyecciones financieras exactas. <u style={{ color: '#b45309' }}>Completar ahora</u>
+          </div>
+        )}
+
+        {/* 1. TARJETAS DE RESUMEN */}
         <div className="ppf-dashboard-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
           <div className="ppf-card ppf-card--income">
             <p className="ppf-label">TOTAL INGRESOS</p>
@@ -127,9 +139,8 @@ const HomePage = () => {
             <p className="ppf-text-muted">≈ ${(financials.expenses / trm).toFixed(2)} USD</p>
           </div>
 
-          {/* TARJETA DE VALORES AHORRADOS */}
           <div className="ppf-card ppf-card--saving">
-            <p className="ppf-label">TOTAL VALORES AHORRADOS</p>
+            <p className="ppf-label">VALORES AHORRADOS</p>
             <h2 style={{ color: 'var(--ppf-color-saving)' }}>
               ${totalSaved.toLocaleString('es-CO')}
             </h2>
@@ -137,7 +148,7 @@ const HomePage = () => {
           </div>
 
           <div className="ppf-card ppf-card--balance">
-            <p className="ppf-label">BALANCE NETO (DISPONIBLE)</p>
+            <p className="ppf-label">BALANCE NETO</p>
             <h2>${financials.balance.toLocaleString('es-CO')}</h2>
             <p className="ppf-text-muted">≈ ${(financials.balance / trm).toFixed(2)} USD</p>
           </div>
@@ -149,7 +160,7 @@ const HomePage = () => {
           <TransactionForm userId={user?.id} onTransactionAdded={fetchData} />
         </div>
 
-        {/* 3. FILA DE METAS: Tabla Multimetas Proyectada */}
+        {/* 3. FILA DE METAS */}
         <div className="ppf-dashboard-grid">
           <div className="ppf-savings-card-full">
             <SavingsGoal 
